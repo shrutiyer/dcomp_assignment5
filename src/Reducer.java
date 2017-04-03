@@ -3,7 +3,7 @@ import java.rmi.RemoteException;
 
 public class Reducer implements iReducer{
     @Override
-    public iReducer creatReduceTask(String key, iMaster master) throws RemoteException, AlreadyBoundException {
+    public iReducer createReduceTask(String key, iMaster master) throws RemoteException, AlreadyBoundException {
         return null;
     }
 

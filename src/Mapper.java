@@ -9,6 +9,9 @@ public class Mapper implements iMapper{
 
     @Override
     public void processInput(String input, iMaster theMaster) throws RemoteException, AlreadyBoundException {
+        // Count the words in String input
+        // Create list of keys (words in the string)
+        // call getReducers() on theMaster
 
     }
 }

@@ -14,6 +14,8 @@ public class Master implements iMaster{
 
     @Override
     public iReducer[] getReducers(String[] keys) throws RemoteException, AlreadyBoundException {
+        // iMapper object calls this function, sends its list of keys.
+        // Returns array of corresponding reducers to the mapper
         return new iReducer[0];
     }
 
