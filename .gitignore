@@ -37,6 +37,9 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+*.properties
+*.xml
+
 # ECLIPSE GITIGNORE
 
 .metadata

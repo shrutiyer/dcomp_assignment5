@@ -3,7 +3,7 @@ import java.rmi.RemoteException;
 
 public class Mapper implements iMapper{
     @Override
-    public iMapper creatMapTask(String name) throws RemoteException, AlreadyBoundException {
+    public iMapper createMapTask(String name) throws RemoteException, AlreadyBoundException {
         return null;
     }
 

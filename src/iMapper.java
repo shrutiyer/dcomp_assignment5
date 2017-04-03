@@ -6,7 +6,7 @@ import java.util.*;
 
 public interface iMapper extends Remote {
 
-    public iMapper creatMapTask(String name) throws RemoteException, AlreadyBoundException;
+    public iMapper createMapTask(String name) throws RemoteException, AlreadyBoundException;
     public void processInput(String input, iMaster theMaster) throws RemoteException, AlreadyBoundException;
 
 }
