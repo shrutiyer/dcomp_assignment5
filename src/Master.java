@@ -26,5 +26,9 @@ public class Master implements iMaster{
     public void receiveOutput(String key, int value) throws RemoteException {
 
     }
-    
+
+    public void startWordCount() {
+        // Loop through each line and call a mapper function
+    }
+
 }
