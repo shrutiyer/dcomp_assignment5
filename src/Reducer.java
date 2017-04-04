@@ -9,11 +9,12 @@ public class Reducer implements iReducer{
 
     @Override
     public void receiveValues(int value) throws RemoteException {
-
+        // called by the mapper task, receives a word count.
     }
 
     @Override
     public int terminate() throws RemoteException {
+        // tell the reducer to start reducing?
         return 0;
     }
 }
