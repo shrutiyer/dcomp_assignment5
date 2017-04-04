@@ -18,7 +18,9 @@ public class Mapper implements iMapper {
 
     @Override
     public iMapper createMapTask(String name) throws RemoteException, AlreadyBoundException {
-        return new Mapper();
+        // As far as we know, the name isn't actually necessary. We're just using it to differentiate b/w the Mapper
+        // manager (which has no name) and an actual task (which has a name)
+        return new Mapper(name);
     }
 
     @Override
