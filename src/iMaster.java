@@ -6,8 +6,8 @@ import java.util.*;
 
 public interface iMaster extends Remote {
 
-    public iReducer[] getReducers(String [] keys) throws RemoteException, AlreadyBoundException;
-    public void markMapperDone() throws RemoteException;
+    public iReducer[] getReducers(String [] keys) throws RemoteException, AlreadyBoundException, NotBoundException;
+    // public void markMapperDone() throws RemoteException;
     public void receiveOutput(String key, int value) throws RemoteException;
 
 }
