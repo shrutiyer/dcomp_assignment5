@@ -51,5 +51,6 @@ public class Mapper extends UnicastRemoteObject implements iMapper {
         for (int i = 0; i < keys.length; i++)
             reducers[i].receiveValues(counts.get(keys[i]));
         LocateRegistry.getRegistry(this.ip).unbind(this.name);
+        theMaster.markMapperDone();
     }
 }

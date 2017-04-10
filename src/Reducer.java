@@ -8,6 +8,7 @@ public class Reducer extends UnicastRemoteObject implements iReducer{
     private String ip;
     private iMaster master;
     private String key;
+    private int wordCount;
 
     public Reducer(String ip) throws RemoteException {
         Registry reg = LocateRegistry.getRegistry(ip);
@@ -33,11 +34,13 @@ public class Reducer extends UnicastRemoteObject implements iReducer{
     public void receiveValues(int value) throws RemoteException {
         // called by the mapper task, receives a word count.
         System.out.println("\"" + this.key + "\" reducer value received: " + value);
+        wordCount = wordCount + value;
     }
 
     @Override
     public int terminate() throws RemoteException {
-        // tell the reducer to start reducing?
+        // tell the reducer to stop reducing
+        master.receiveOutput(key, wordCount);
         return 0;
     }
 }
