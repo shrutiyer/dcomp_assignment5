@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -18,7 +15,7 @@ public class Master extends UnicastRemoteObject implements iMaster {
     private List<String> IPList;
     private String filePath;
     private Map<String, iReducer> reducers;
-    private Map<String, int> wordCountMap;
+    private Map<String, Integer> wordCountMap;
 
     int reducerIndex; // We use this variable to assign Reducer tasks to Workers evenly. In getReducers, whenever a new
                       // Reducer task is created, it increments, so the next Reducer is placed on a different IP
@@ -58,7 +55,7 @@ public class Master extends UnicastRemoteObject implements iMaster {
     }
 
     @Override
-    public void markMapperDone() throws RemoteException {
+    public void markMapperDone() throws IOException {
         // keeps track of how many mappers need to be still processed
         this.mapTaskIndex--;
         if (this.mapTaskIndex <= 0) {
@@ -74,16 +71,16 @@ public class Master extends UnicastRemoteObject implements iMaster {
     }
 
     @Override
-    public void receiveOutput(String key, int value) throws RemoteException {
+    public void receiveOutput(String key, int value) throws IOException {
         // reducers call this function when they are done counting
         this.wordCountMap.put(key, value);
         this.writeWordCountToFile();
     }
 
-    private void writeWordCountToFile() {
+    private void writeWordCountToFile() throws IOException {
         FileWriter fileStream = new FileWriter("values.txt");
         BufferedWriter out = new BufferedWriter(fileStream);
-        for (Map.Entry<String, int> entry : wordCountMap.entrySet()) {
+        for (Map.Entry<String, Integer> entry : wordCountMap.entrySet()) {
             out.write(entry.getKey() + ": " + entry.getValue() + "\n");
         }
     }

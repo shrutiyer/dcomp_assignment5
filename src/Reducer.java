@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -38,7 +39,7 @@ public class Reducer extends UnicastRemoteObject implements iReducer{
     }
 
     @Override
-    public int terminate() throws RemoteException {
+    public int terminate() throws IOException {
         // tell the reducer to stop reducing
         master.receiveOutput(key, wordCount);
         return 0;
