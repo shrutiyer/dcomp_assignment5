@@ -13,7 +13,7 @@ public class Reducer extends UnicastRemoteObject implements iReducer{
     private String key;
     private int wordCount;
     private Registry reg;
-    private List<String> reducerTasks; // List of tasks on a specific machine. This variable is only used by the manager
+    private List<iReducer> reducerTasks; // List of tasks on a specific machine. This variable is only used by the manager
 
     public Reducer(Registry r) throws RemoteException {
         reg = r;
@@ -22,26 +22,25 @@ public class Reducer extends UnicastRemoteObject implements iReducer{
         System.out.println("Reduce manager created.");
     }
 
-    public Reducer(String key, iMaster master, Registry r) throws RemoteException, AlreadyBoundException {
+    public Reducer(String key, iMaster master) throws RemoteException, AlreadyBoundException {
         this.key = key;
-        r.bind(key, this);
         this.master = master;
     }
 
     @Override
     public void terminateReducingTasks() throws IOException, NotBoundException {
-        for (String s : reducerTasks) {
-            iReducer r = (iReducer) reg.lookup(s);
+        for (iReducer r : reducerTasks) {
             r.terminate();
-            reg.unbind(s);
         }
+        reducerTasks.clear();
         reg.unbind("reduce_manager");
     }
 
     @Override
     public iReducer createReduceTask(String key, iMaster master) throws RemoteException, AlreadyBoundException {
-        reducerTasks.add(key);
-        return new Reducer(key, master, reg);
+        Reducer r = new Reducer(key, master);
+        reducerTasks.add(r);
+        return r;
     }
 
     @Override
