@@ -53,8 +53,8 @@ public class Master extends UnicastRemoteObject implements iMaster {
             }
             // else, send the reducer we've already created.
             reducers[i] = this.reducers.get(k);
-            mutex.release();
             i++;
+            mutex.release();
         }
         return reducers;
     }
