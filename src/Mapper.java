@@ -24,7 +24,6 @@ public class Mapper extends UnicastRemoteObject implements iMapper {
     }
 
     public Mapper(String name, String ip) throws RemoteException, AlreadyBoundException {
-        System.out.println("Map task created with name: " + name);
         Registry reg = LocateRegistry.getRegistry(ip);
         counts = new HashMap<>();
         this.ip = ip;
@@ -59,13 +58,11 @@ public class Mapper extends UnicastRemoteObject implements iMapper {
             @Override
             public void run() {
                 try {
-                    System.out.println("Mapping: " + input);
                     String[] words = input.split("\\W+");
                     for (String w : words)
                         counts.put(w, counts.getOrDefault(w, 0) + 1);
                     String[] keys = counts.keySet().toArray(new String[counts.keySet().size()]);
                     iReducer[] reducers = theMaster.getReducers(keys);
-                    System.out.println("Received " + reducers.length + " reducers for " + keys.length + " keys");
                     for (int i = 0; i < keys.length; i++)
                         reducers[i].receiveValues(counts.get(keys[i]));
                     LocateRegistry.getRegistry(ip).unbind(name);

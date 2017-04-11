@@ -29,7 +29,6 @@ public class Reducer extends UnicastRemoteObject implements iReducer{
         this.key = key;
         reg.bind(key, this);
         this.master = master;
-        System.out.println("Reduce task created.");
     }
 
     @Override
@@ -52,7 +51,6 @@ public class Reducer extends UnicastRemoteObject implements iReducer{
     @Override
     public void receiveValues(int value) throws RemoteException {
         // called by the mapper task, receives a word count.
-        System.out.println("\"" + this.key + "\" reducer value received: " + value);
         wordCount = wordCount + value;
     }
 

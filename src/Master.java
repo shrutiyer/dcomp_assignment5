@@ -18,9 +18,9 @@ public class Master extends UnicastRemoteObject implements iMaster {
     private Map<String, Integer> wordCountMap;
     private boolean processWordFile;
 
-    int reducerIndex; // We use this variable to assign Reducer tasks to Workers evenly. In getReducers, whenever a new
+    private int reducerIndex; // We use this variable to assign Reducer tasks to Workers evenly. In getReducers, whenever a new
     // Reducer task is created, it increments, so the next Reducer is placed on a different IP
-    int mapTaskIndex; // It increases whenever there is a map task assigned and reduces when the map task is done.
+    private int mapTaskIndex; // It increases whenever there is a map task assigned and reduces when the map task is done.
 
     public Master(String myIp, String path, List<String> IPs) throws RemoteException {
         filePath = path;
@@ -39,7 +39,6 @@ public class Master extends UnicastRemoteObject implements iMaster {
         // If a key is received without a corresponding reducer, then create the reducer using createReduceTask
         iReducer[] reducers = new iReducer[keys.length];
         int i = 0;
-        System.out.println("Request for reducers: " + Arrays.toString(keys));
         for (String k : keys) {
             // if there is no reducer associated with a key, create a new reducer
             mutex.acquire();
@@ -65,9 +64,8 @@ public class Master extends UnicastRemoteObject implements iMaster {
         mutex.acquire();
         this.mapTaskIndex--;
         mutex.release();
-        System.out.println("A mapper task just finished! Tasks left to execute: " + mapTaskIndex + " still processing word file: " + processWordFile);
         if (this.mapTaskIndex <= 0 && !processWordFile) {
-            System.out.println("No mapper tasks left to execute. THIS SHOULD ONLY HAPPEN ONCE");
+            System.out.println("All mapper tasks have completed. Waiting 5 seconds.");
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
@@ -94,7 +92,7 @@ public class Master extends UnicastRemoteObject implements iMaster {
     }
 
     private void writeWordCountToFile() throws IOException {
-        System.out.println("WRITING WORD COUNTS TO FILE YOLO");
+        System.out.println("Writing to File...");
         FileWriter fileStream = new FileWriter("values.txt");
         BufferedWriter out = new BufferedWriter(fileStream);
         for (Map.Entry<String, Integer> entry : wordCountMap.entrySet()) {
@@ -105,6 +103,7 @@ public class Master extends UnicastRemoteObject implements iMaster {
     }
 
     public void startWordCount() throws IOException, NotBoundException, AlreadyBoundException, InterruptedException {
+        System.out.println("Starting to read file and create Mapper tasks for each line.");
         BufferedReader reader = new BufferedReader(new FileReader(filePath));
         String line;
         int i = 0;
@@ -127,12 +126,12 @@ public class Master extends UnicastRemoteObject implements iMaster {
             line = nextLine;
         }
         processWordFile = false;
+        System.out.println("Finished sending lines to Mappers.");
         for (String ip : IPList) {
             System.out.println("Terminating map manager at IP: " + ip);
             LocateRegistry.getRegistry(ip).unbind("map_manager");
         }
 
-        System.out.println("Finished sending lines to Mappers.");
     }
 
 }
