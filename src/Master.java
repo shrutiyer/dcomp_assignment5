@@ -42,18 +42,18 @@ public class Master extends UnicastRemoteObject implements iMaster {
         System.out.println("Request for reducers: " + Arrays.toString(keys));
         for (String k : keys) {
             // if there is no reducer associated with a key, create a new reducer
+            mutex.acquire();
             if (!this.reducers.containsKey(k)) {
-                mutex.acquire();
                 if (reducerIndex == IPList.size())
                     reducerIndex = 0;
                 Registry reg = LocateRegistry.getRegistry(IPList.get(reducerIndex));
                 iReducer factory = (iReducer) reg.lookup("reduce_manager");
                 this.reducers.put(k, factory.createReduceTask(k, this));
                 reducerIndex++;
-                mutex.release();
             }
             // else, send the reducer we've already created.
             reducers[i] = this.reducers.get(k);
+            mutex.release();
             i++;
         }
         return reducers;
@@ -98,6 +98,8 @@ public class Master extends UnicastRemoteObject implements iMaster {
         for (Map.Entry<String, Integer> entry : wordCountMap.entrySet()) {
             out.write(entry.getKey() + ": " + entry.getValue() + "\n");
         }
+        System.out.println("File write successful.");
+        System.exit(0);
     }
 
     public void startWordCount() throws IOException, NotBoundException, AlreadyBoundException, InterruptedException {
@@ -121,8 +123,10 @@ public class Master extends UnicastRemoteObject implements iMaster {
             line = nextLine;
         }
         processWordFile = false;
-        for (String ip : IPList)
+        for (String ip : IPList) {
+            System.out.println("Terminating map manager at IP: " + ip);
             LocateRegistry.getRegistry(ip).unbind("map_manager");
+        }
 
         System.out.println("Finished sending lines to Mappers.");
     }
