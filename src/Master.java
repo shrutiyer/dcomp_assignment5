@@ -64,7 +64,7 @@ public class Master extends UnicastRemoteObject implements iMaster {
         this.mapTaskIndex--;
         mutex.release();
         if (this.mapTaskIndex <= 0 && !processWordFile) {
-            System.out.println("All mapper tasks have completed. Waiting 5 seconds.");
+            System.out.println("All mapper tasks have completed. Waiting 3 seconds.");
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
@@ -80,7 +80,7 @@ public class Master extends UnicastRemoteObject implements iMaster {
                         e.printStackTrace();
                     }
                 }
-            }, 5000);
+            }, 3000);
         }
     }
 
@@ -88,15 +88,19 @@ public class Master extends UnicastRemoteObject implements iMaster {
     public void receiveOutput(String key, int value) throws IOException {
         // reducers call this function when they are done counting
         this.wordCountMap.put(key, value);
+        System.out.println("Received value: " + value + " for key " + key);
     }
 
     private void writeWordCountToFile() throws IOException {
         System.out.println("Writing to File...");
-        FileWriter fileStream = new FileWriter("values.txt");
-        BufferedWriter out = new BufferedWriter(fileStream);
+        PrintWriter writer = new PrintWriter("poop.txt", "UTF-8");
+        System.out.println(Arrays.toString(wordCountMap.entrySet().toArray()));
         for (Map.Entry<String, Integer> entry : wordCountMap.entrySet()) {
-            out.write(entry.getKey() + ": " + entry.getValue() + "\n");
+            String s = entry.getKey() + ": " + entry.getValue();
+            System.out.println(s);
+            writer.println(s);
         }
+        writer.close();
         System.out.println("File write successful.");
         System.exit(0);
     }

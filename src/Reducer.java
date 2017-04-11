@@ -29,6 +29,7 @@ public class Reducer extends UnicastRemoteObject implements iReducer{
 
     @Override
     public void terminateReducingTasks() throws IOException, NotBoundException {
+        System.out.println("Terminating all managed reduced tasks");
         for (iReducer r : reducerTasks) {
             r.terminate();
         }
@@ -46,7 +47,7 @@ public class Reducer extends UnicastRemoteObject implements iReducer{
     @Override
     public void receiveValues(int value) throws RemoteException {
         // called by the mapper task, receives a word count.
-        System.out.println("Reducer with key " + key + "received value " + value);
+        System.out.println("Reducer with key " + key + " received value " + value);
         wordCount = wordCount + value;
     }
 
