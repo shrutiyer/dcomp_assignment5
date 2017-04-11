@@ -9,7 +9,8 @@ public class MasterRunner {
 
     private static Master master;
 
-    public static void main(String[] argv) throws IOException, AlreadyBoundException, NotBoundException {
+    public static void main(String[] argv) throws IOException, AlreadyBoundException, NotBoundException,
+            InterruptedException {
         Scanner sc = new Scanner(System.in);
         File f = null;
         while (f == null || !f.exists()) {

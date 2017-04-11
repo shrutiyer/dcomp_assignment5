@@ -7,8 +7,9 @@ import java.util.*;
 
 public interface iReducer extends Remote {
 
-    public iReducer createReduceTask(String key, iMaster master) throws RemoteException, AlreadyBoundException;
-    public void receiveValues(int value) throws RemoteException;
-    public int terminate() throws IOException;
+    iReducer createReduceTask(String key, iMaster master) throws RemoteException, AlreadyBoundException;
+    void receiveValues(int value) throws RemoteException;
+    int terminate() throws IOException;
+    void terminateReducingTasks() throws IOException, NotBoundException;
 
 }
