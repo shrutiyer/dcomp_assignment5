@@ -15,19 +15,20 @@ public class Mapper extends UnicastRemoteObject implements iMapper {
 
     public Map<String, Integer> counts;
     private String ip, name;
+    private Registry reg;
 
-    public Mapper(String ip) throws RemoteException {
-        Registry reg = LocateRegistry.getRegistry(ip);
+    public Mapper(String ip, Registry r) throws RemoteException {
         this.ip = ip;
+        reg = r;
         reg.rebind("map_manager", (iMapper) this);
         System.out.println("Map manager created.");
     }
 
-    public Mapper(String name, String ip) throws RemoteException, AlreadyBoundException {
-        Registry reg = LocateRegistry.getRegistry(ip);
+    public Mapper(String name, String ip, Registry r) throws RemoteException, AlreadyBoundException {
         counts = new HashMap<>();
         this.ip = ip;
         this.name = name;
+        reg = r;
         reg.bind(name, this);
     }
 
@@ -35,7 +36,7 @@ public class Mapper extends UnicastRemoteObject implements iMapper {
     public iMapper createMapTask(String name) throws RemoteException, AlreadyBoundException {
         // As far as we know, the name isn't actually necessary. We're just using it to differentiate b/w the Mapper
         // manager (which has no name) and an actual task (which has a name)
-        return new Mapper(name, ip);
+        return new Mapper(name, ip, reg);
     }
 
     @Override
@@ -65,7 +66,7 @@ public class Mapper extends UnicastRemoteObject implements iMapper {
                     iReducer[] reducers = theMaster.getReducers(keys);
                     for (int i = 0; i < keys.length; i++)
                         reducers[i].receiveValues(counts.get(keys[i]));
-                    LocateRegistry.getRegistry(ip).unbind(name);
+                    reg.unbind(name);
                     theMaster.markMapperDone();
                 } catch (IOException | AlreadyBoundException | NotBoundException | InterruptedException e) {
                     System.out.println("An error occurred while processing input.");
