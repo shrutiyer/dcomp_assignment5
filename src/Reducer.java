@@ -34,7 +34,6 @@ public class Reducer extends UnicastRemoteObject implements iReducer{
             r.terminate();
         }
         reducerTasks.clear();
-        reg.unbind("reduce_manager");
     }
 
     @Override

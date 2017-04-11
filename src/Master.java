@@ -130,10 +130,6 @@ public class Master extends UnicastRemoteObject implements iMaster {
         }
         processWordFile = false;
         System.out.println("Finished sending lines to Mappers.");
-        for (String ip : IPList) {
-            System.out.println("Terminating map manager at IP: " + ip);
-            LocateRegistry.getRegistry(ip).unbind("map_manager");
-        }
 
     }
 
