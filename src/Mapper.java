@@ -34,6 +34,7 @@ public class Mapper extends UnicastRemoteObject implements iMapper {
     public iMapper createMapTask(String name) throws RemoteException, AlreadyBoundException {
         // As far as we know, the name isn't actually necessary. We're just using it to differentiate b/w the Mapper
         // manager (which has no name) and an actual task (which has a name)
+        System.out.println("Creating map task for name: " + name);
         return new Mapper(name, reg);
     }
 
