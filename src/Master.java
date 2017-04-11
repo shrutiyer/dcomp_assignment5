@@ -22,13 +22,12 @@ public class Master extends UnicastRemoteObject implements iMaster {
     // Reducer task is created, it increments, so the next Reducer is placed on a different IP
     private int mapTaskIndex; // It increases whenever there is a map task assigned and reduces when the map task is done.
 
-    public Master(String myIp, String path, List<String> IPs) throws RemoteException {
+    public Master(String myIp, String path, List<String> IPs, Registry r) throws RemoteException {
         filePath = path;
         IPList = IPs;
         reducers = new HashMap<>();
         wordCountMap = new HashMap<>();
-        Registry reg = LocateRegistry.getRegistry(myIp);
-        reg.rebind("master", this);
+        r.rebind("master", this);
     }
 
     @Override
