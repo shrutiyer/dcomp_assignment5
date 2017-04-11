@@ -1,4 +1,5 @@
 import java.io.*;
+import java.nio.file.Paths;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -93,7 +94,7 @@ public class Master extends UnicastRemoteObject implements iMaster {
 
     private void writeWordCountToFile() throws IOException {
         System.out.println("Writing to File...");
-        PrintWriter writer = new PrintWriter("poop.txt", "UTF-8");
+        PrintWriter writer = new PrintWriter("counts.txt", "UTF-8");
         System.out.println(Arrays.toString(wordCountMap.entrySet().toArray()));
         for (Map.Entry<String, Integer> entry : wordCountMap.entrySet()) {
             String s = entry.getKey() + ": " + entry.getValue();
