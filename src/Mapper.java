@@ -14,19 +14,17 @@ import java.util.TimerTask;
 public class Mapper extends UnicastRemoteObject implements iMapper {
 
     public Map<String, Integer> counts;
-    private String ip, name;
+    private String name;
     private Registry reg;
 
-    public Mapper(String ip, Registry r) throws RemoteException {
-        this.ip = ip;
+    public Mapper(Registry r) throws RemoteException {
         reg = r;
         reg.rebind("map_manager", (iMapper) this);
         System.out.println("Map manager created.");
     }
 
-    public Mapper(String name, String ip, Registry r) throws RemoteException, AlreadyBoundException {
+    public Mapper(String name, Registry r) throws RemoteException, AlreadyBoundException {
         counts = new HashMap<>();
-        this.ip = ip;
         this.name = name;
         reg = r;
         reg.bind(name, this);
@@ -36,7 +34,7 @@ public class Mapper extends UnicastRemoteObject implements iMapper {
     public iMapper createMapTask(String name) throws RemoteException, AlreadyBoundException {
         // As far as we know, the name isn't actually necessary. We're just using it to differentiate b/w the Mapper
         // manager (which has no name) and an actual task (which has a name)
-        return new Mapper(name, ip, reg);
+        return new Mapper(name, reg);
     }
 
     @Override

@@ -9,23 +9,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Reducer extends UnicastRemoteObject implements iReducer{
-    private String ip;
     private iMaster master;
     private String key;
     private int wordCount;
-    Registry reg;
+    private Registry reg;
     private List<String> reducerTasks; // List of tasks on a specific machine. This variable is only used by the manager
 
-    public Reducer(String ip, Registry r) throws RemoteException {
+    public Reducer(Registry r) throws RemoteException {
         reg = r;
-        this.ip = ip;
         this.reducerTasks = new ArrayList<>();
         reg.rebind("reduce_manager", this);
         System.out.println("Reduce manager created.");
     }
 
-    public Reducer(String key, String ip, iMaster master, Registry r) throws RemoteException, AlreadyBoundException {
-        this.ip = ip;
+    public Reducer(String key, iMaster master, Registry r) throws RemoteException, AlreadyBoundException {
         this.key = key;
         r.bind(key, this);
         this.master = master;
@@ -38,13 +35,13 @@ public class Reducer extends UnicastRemoteObject implements iReducer{
             r.terminate();
             reg.unbind(s);
         }
-        LocateRegistry.getRegistry(this.ip).unbind("reduce_manager");
+        reg.unbind("reduce_manager");
     }
 
     @Override
     public iReducer createReduceTask(String key, iMaster master) throws RemoteException, AlreadyBoundException {
         reducerTasks.add(key);
-        return new Reducer(key, ip, master, reg);
+        return new Reducer(key, master, reg);
     }
 
     @Override
