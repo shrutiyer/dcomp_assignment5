@@ -51,18 +51,20 @@ public class Master extends UnicastRemoteObject implements iMaster {
                 this.reducers.put(k, factory.createReduceTask(k, this));
                 reducerIndex++;
             }
+            mutex.release();
             // else, send the reducer we've already created.
             reducers[i] = this.reducers.get(k);
             i++;
-            mutex.release();
         }
         return reducers;
     }
 
     @Override
-    public void markMapperDone() throws IOException {
+    public void markMapperDone() throws IOException, InterruptedException {
         // keeps track of how many mappers need to be still processed
+        mutex.acquire();
         this.mapTaskIndex--;
+        mutex.release();
         System.out.println("A mapper task just finished! Tasks left to execute: " + mapTaskIndex + " still processing word file: " + processWordFile);
         if (this.mapTaskIndex <= 0 && !processWordFile) {
             System.out.println("No mapper tasks left to execute. THIS SHOULD ONLY HAPPEN ONCE");
@@ -114,7 +116,9 @@ public class Master extends UnicastRemoteObject implements iMaster {
                 i = 0;
             Registry reg = LocateRegistry.getRegistry(IPList.get(i));
             iMapper factory = (iMapper) reg.lookup("map_manager");
+            mutex.acquire();
             mapTaskIndex++;
+            mutex.release();
             String nextLine = reader.readLine();
             processWordFile = nextLine != null;
             factory.createMapTask("map_task_" + j).processInput(line, this); // TODO: this line is blocking

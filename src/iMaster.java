@@ -9,7 +9,7 @@ public interface iMaster extends Remote {
 
     public iReducer[] getReducers(String [] keys) throws RemoteException, AlreadyBoundException, NotBoundException,
             InterruptedException;
-    public void markMapperDone() throws IOException;
+    public void markMapperDone() throws IOException, InterruptedException;
     public void receiveOutput(String key, int value) throws IOException;
 
 }
