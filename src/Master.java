@@ -89,16 +89,13 @@ public class Master extends UnicastRemoteObject implements iMaster {
     public void receiveOutput(String key, int value) throws IOException {
         // reducers call this function when they are done counting
         this.wordCountMap.put(key, value);
-        System.out.println("Received value: " + value + " for key " + key);
     }
 
     private void writeWordCountToFile() throws IOException {
         System.out.println("Writing to File...");
         PrintWriter writer = new PrintWriter("counts.txt", "UTF-8");
-        System.out.println(Arrays.toString(wordCountMap.entrySet().toArray()));
         for (Map.Entry<String, Integer> entry : wordCountMap.entrySet()) {
             String s = entry.getKey() + ": " + entry.getValue();
-            System.out.println(s);
             writer.println(s);
         }
         writer.close();
