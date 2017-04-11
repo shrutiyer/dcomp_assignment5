@@ -27,7 +27,6 @@ public class Mapper extends UnicastRemoteObject implements iMapper {
         counts = new HashMap<>();
         this.name = name;
         reg = r;
-        reg.bind(name, this);
     }
 
     @Override
@@ -35,7 +34,9 @@ public class Mapper extends UnicastRemoteObject implements iMapper {
         // As far as we know, the name isn't actually necessary. We're just using it to differentiate b/w the Mapper
         // manager (which has no name) and an actual task (which has a name)
         System.out.println("Creating map task for name: " + name);
-        return new Mapper(name, reg);
+        iMapper m = new Mapper(name, reg);
+        reg.bind(name, m);
+        return m;
     }
 
     @Override
