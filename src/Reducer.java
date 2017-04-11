@@ -13,28 +13,27 @@ public class Reducer extends UnicastRemoteObject implements iReducer{
     private iMaster master;
     private String key;
     private int wordCount;
+    Registry reg;
     private List<String> reducerTasks; // List of tasks on a specific machine. This variable is only used by the manager
 
-    public Reducer(String ip) throws RemoteException {
-        Registry reg = LocateRegistry.getRegistry(ip);
+    public Reducer(String ip, Registry r) throws RemoteException {
+        reg = r;
         this.ip = ip;
         this.reducerTasks = new ArrayList<>();
         reg.rebind("reduce_manager", this);
         System.out.println("Reduce manager created.");
     }
 
-    public Reducer(String key, String ip, iMaster master) throws RemoteException, AlreadyBoundException {
-        Registry reg = LocateRegistry.getRegistry(ip);
+    public Reducer(String key, String ip, iMaster master, Registry r) throws RemoteException, AlreadyBoundException {
         this.ip = ip;
         this.key = key;
-        reg.bind(key, this);
+        r.bind(key, this);
         this.master = master;
     }
 
     @Override
     public void terminateReducingTasks() throws IOException, NotBoundException {
         for (String s : reducerTasks) {
-            Registry reg = LocateRegistry.getRegistry(this.ip);
             iReducer r = (iReducer) reg.lookup(s);
             r.terminate();
             reg.unbind(s);
@@ -45,7 +44,7 @@ public class Reducer extends UnicastRemoteObject implements iReducer{
     @Override
     public iReducer createReduceTask(String key, iMaster master) throws RemoteException, AlreadyBoundException {
         reducerTasks.add(key);
-        return new Reducer(key, ip, master);
+        return new Reducer(key, ip, master, reg);
     }
 
     @Override
