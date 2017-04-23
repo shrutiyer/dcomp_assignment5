@@ -21,16 +21,12 @@ public class ReduceTask extends UnicastRemoteObject implements iReduceTask {
     @Override
     public void receiveValues(int value) throws RemoteException {
         // called by the mapper task, receives a word count.
-        System.out.println("ReduceTask with key " + key + " received value " + value);
-        System.out.print("Old word count was: " + wordCount);
         wordCount = wordCount + value;
-        System.out.println(". New word count is: " + wordCount);
     }
 
     @Override
     public int terminate() throws IOException {
         // tell the reducer to stop reducing
-        System.out.println("Sending: " + wordCount + " for key " + key);
         master.receiveOutput(key, wordCount);
         return 0;
     }

@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MapTask implements iMapTask, Serializable {
+public class MapTask extends UnicastRemoteObject implements iMapTask {
 
     public Map<String, Integer> counts;
     private String name;
@@ -29,7 +29,6 @@ public class MapTask implements iMapTask, Serializable {
         (new Timer()).schedule(new TimerTask() {
             @Override
             public void run() {
-                System.out.println("Processing input: " + input);
                 try {
                     String[] words = input.split("\\W+");
                     for (String w : words)
