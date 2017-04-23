@@ -15,7 +15,7 @@ public class Worker {
             System.out.println("Local RMI registry already is running. Using existing registry.");
             localReg = LocateRegistry.getRegistry(localIP, 1099);
         }
-        iMapper mapManager = new Mapper(localReg);
-        iReducer reduceManager = new Reducer(localReg);
+        iMapManager mapManager = new MapManager(localReg);
+        iReduceManager reduceManager = new ReduceManager(localReg);
     }
 }

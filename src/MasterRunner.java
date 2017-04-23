@@ -10,8 +10,6 @@ import java.util.Scanner;
 
 public class MasterRunner {
 
-    private static Master master;
-
     public static void main(String[] argv) throws IOException, AlreadyBoundException, NotBoundException,
             InterruptedException {
         String localIP = argv[0];
@@ -30,7 +28,8 @@ public class MasterRunner {
             String book = sc.next();
             f = new File(Paths.get("books", book).toString());
         }
-        master = new Master(argv[0], f.getCanonicalPath(), Arrays.asList(argv).subList(1, argv.length), localReg);
+        Master master = new Master(argv[0], f.getCanonicalPath(), Arrays.asList(argv).subList(1, argv.length),
+                localReg);
         master.startWordCount();
     }
 
