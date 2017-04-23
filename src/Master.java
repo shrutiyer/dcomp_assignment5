@@ -45,7 +45,7 @@ public class Master extends UnicastRemoteObject implements iMaster {
                 if (reducerIndex == IPList.size())
                     reducerIndex = 0;
                 Registry reg = LocateRegistry.getRegistry(IPList.get(reducerIndex));
-                iReduceTask factory = (iReduceTask) reg.lookup("reduce_manager");
+                iReduceManager factory = (iReduceManager) reg.lookup("reduce_manager");
                 this.reducers.put(k, factory.createReduceTask(k, this));
                 reducerIndex++;
             }
@@ -72,7 +72,7 @@ public class Master extends UnicastRemoteObject implements iMaster {
                     try {
                         for (String ip : IPList) {
                             System.out.println("Terminating reduce tasks for IP: " + ip);
-                            ((iReduceTask) LocateRegistry.getRegistry(ip).lookup("reduce_manager")).terminateReducingTasks();
+                            ((iReduceManager) LocateRegistry.getRegistry(ip).lookup("reduce_manager")).terminateReducingTasks();
                         }
                         writeWordCountToFile();
                     } catch (IOException | NotBoundException e) {
@@ -114,13 +114,13 @@ public class Master extends UnicastRemoteObject implements iMaster {
             if (i == IPList.size())
                 i = 0;
             Registry reg = LocateRegistry.getRegistry(IPList.get(i));
-            iMapTask factory = (iMapTask) reg.lookup("map_manager");
+            iMapManager factory = (iMapManager) reg.lookup("map_manager");
             mutex.acquire();
             mapTaskIndex++;
             mutex.release();
             String nextLine = reader.readLine();
             processWordFile = nextLine != null;
-            factory.createMapTask("map_task_" + j).processInput(line, this); // TODO: this line is blocking
+            factory.createMapTask("map_task_" + j).processInput(line, this);
             j++;
             i++;
             line = nextLine;
