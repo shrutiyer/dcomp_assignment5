@@ -58,9 +58,8 @@ public class Master extends UnicastRemoteObject implements iMaster {
     }
 
     @Override
-    public void markReducerDone(String key) throws IOException {
-        System.out.println("Marking Reducer Done Key: " + key);
-        System.out.println("Reducers Size " + reducers.size());
+    public void markReducerDone(String key) throws IOException, InterruptedException {
+        mutex.acquire();
         reducers.remove(key);
         if (this.reducers.size() == 0 && !processWordFile) {
             (new Timer()).schedule(new TimerTask() {
@@ -74,6 +73,7 @@ public class Master extends UnicastRemoteObject implements iMaster {
                 }
             }, 0);
         }
+        mutex.release();
     }
 
     @Override

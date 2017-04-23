@@ -36,7 +36,7 @@ public class ReduceTask extends UnicastRemoteObject implements iReduceTask {
                 try {
                     master.receiveOutput(key, wordCount);
                     master.markReducerDone(key);
-                } catch (IOException e) {
+                } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
             }
