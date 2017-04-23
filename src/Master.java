@@ -46,7 +46,7 @@ public class Master extends UnicastRemoteObject implements iMaster {
                     reducerIndex = 0;
                 Registry reg = LocateRegistry.getRegistry(IPList.get(reducerIndex));
                 iReduceManager factory = (iReduceManager) reg.lookup("reduce_manager");
-                this.reducers.put(k, factory.createReduceTask(k, this));
+                this.reducers.put(k, factory.createReduceTask(k, this, wordCountMap.getOrDefault(k,0)));
                 reducerIndex++;
             }
             mutex.release();
@@ -58,29 +58,21 @@ public class Master extends UnicastRemoteObject implements iMaster {
     }
 
     @Override
-    public void markMapperDone() throws IOException, InterruptedException {
-        // keeps track of how many mappers need to be still processed
-        mutex.acquire();
-        this.mapTaskIndex--;
-        mutex.release();
-        if (this.mapTaskIndex <= 0 && !processWordFile) {
-            System.out.println("All mapper tasks have completed. Waiting 3 seconds.");
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask() {
+    public void markReducerDone(String key) throws IOException {
+        System.out.println("Marking Reducer Done Key: " + key);
+        System.out.println("Reducers Size " + reducers.size());
+        reducers.remove(key);
+        if (this.reducers.size() == 0 && !processWordFile) {
+            (new Timer()).schedule(new TimerTask() {
                 @Override
                 public void run() {
                     try {
-                        for (String ip : IPList) {
-                            System.out.println("Terminating reduce tasks for IP: " + ip);
-                            ((iReduceManager) LocateRegistry.getRegistry(ip).lookup("reduce_manager")).terminateReducingTasks();
-                        }
                         writeWordCountToFile();
-                    } catch (IOException | NotBoundException e) {
-                        System.out.println("An error occurred when terminating reducing tasks.");
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
-            }, 3000);
+            }, 0);
         }
     }
 

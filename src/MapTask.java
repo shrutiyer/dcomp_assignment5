@@ -37,7 +37,6 @@ public class MapTask extends UnicastRemoteObject implements iMapTask {
                     iReduceTask[] reducers = theMaster.getReducers(keys);
                     for (int i = 0; i < keys.length; i++)
                         reducers[i].receiveValues(counts.get(keys[i]));
-                    theMaster.markMapperDone();
                 } catch (IOException | AlreadyBoundException | NotBoundException | InterruptedException e) {
                     System.out.println("An error occurred while processing input.");
                     e.printStackTrace();

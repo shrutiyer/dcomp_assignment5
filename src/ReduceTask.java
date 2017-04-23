@@ -1,33 +1,45 @@
 import java.io.IOException;
-import java.io.Serializable;
 import java.rmi.AlreadyBoundException;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ReduceTask extends UnicastRemoteObject implements iReduceTask {
     private iMaster master;
     private String key;
     private int wordCount;
+    private Timer timer;
+    private TimerTask timerTask;
 
-    public ReduceTask(String key, iMaster master) throws RemoteException, AlreadyBoundException {
+    public ReduceTask(String key, iMaster master, int count) throws RemoteException, AlreadyBoundException {
         this.key = key;
         this.master = master;
+        this.timer = new Timer();
+        this.wordCount = count;
+        createTimerTask();
     }
 
     @Override
     public void receiveValues(int value) throws RemoteException {
         // called by the mapper task, receives a word count.
+        timerTask.cancel();
+        createTimerTask();
+        timer.schedule(this.timerTask, 5000);
         wordCount = wordCount + value;
     }
 
-    @Override
-    public int terminate() throws IOException {
-        // tell the reducer to stop reducing
-        master.receiveOutput(key, wordCount);
-        return 0;
+    private void createTimerTask () {
+        this.timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    master.receiveOutput(key, wordCount);
+                    master.markReducerDone(key);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
     }
 }

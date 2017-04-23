@@ -5,6 +5,5 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface iReduceManager extends Remote {
-    iReduceTask createReduceTask(String key, iMaster master) throws RemoteException, AlreadyBoundException;
-    void terminateReducingTasks() throws IOException, NotBoundException;
+    iReduceTask createReduceTask(String key, iMaster master, int count) throws RemoteException, AlreadyBoundException;
 }
