@@ -8,7 +8,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReduceTask implements iReduceTask, Serializable {
+public class ReduceTask extends UnicastRemoteObject implements iReduceTask {
     private iMaster master;
     private String key;
     private int wordCount;
