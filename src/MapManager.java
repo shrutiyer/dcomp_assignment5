@@ -18,7 +18,6 @@ public class MapManager extends UnicastRemoteObject implements iMapManager {
         // As far as we know, the name isn't actually necessary. We're just using it to differentiate b/w the MapTask
         // manager (which has no name) and an actual task (which has a name)
         System.out.println("Creating map task for name: " + name);
-        iMapTask m = new MapTask(name);
-        return m;
+        return new MapTask(name);
     }
 }

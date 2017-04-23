@@ -29,6 +29,7 @@ public class MapTask implements iMapTask, Serializable {
         (new Timer()).schedule(new TimerTask() {
             @Override
             public void run() {
+                System.out.println("Processing input: " + input);
                 try {
                     String[] words = input.split("\\W+");
                     for (String w : words)

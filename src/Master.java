@@ -87,6 +87,7 @@ public class Master extends UnicastRemoteObject implements iMaster {
     @Override
     public void receiveOutput(String key, int value) throws IOException {
         // reducers call this function when they are done counting
+        System.out.println("Master received value " + value + " for key: " + key);
         this.wordCountMap.put(key, value);
     }
 
