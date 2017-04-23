@@ -1,5 +1,4 @@
 import java.io.*;
-import java.nio.file.Paths;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -15,12 +14,12 @@ public class Master extends UnicastRemoteObject implements iMaster {
 
     private List<String> IPList;
     private String filePath;
-    private Map<String, iReducer> reducers;
+    private Map<String, iReduceTask> reducers;
     private Map<String, Integer> wordCountMap;
     private boolean processWordFile;
 
-    private int reducerIndex; // We use this variable to assign Reducer tasks to Workers evenly. In getReducers, whenever a new
-    // Reducer task is created, it increments, so the next Reducer is placed on a different IP
+    private int reducerIndex; // We use this variable to assign ReduceTask tasks to Workers evenly. In getReducers, whenever a new
+    // ReduceTask task is created, it increments, so the next ReduceTask is placed on a different IP
     private int mapTaskIndex; // It increases whenever there is a map task assigned and reduces when the map task is done.
 
     public Master(String myIp, String path, List<String> IPs, Registry r) throws RemoteException {
@@ -32,12 +31,12 @@ public class Master extends UnicastRemoteObject implements iMaster {
     }
 
     @Override
-    public iReducer[] getReducers(String[] keys) throws RemoteException, AlreadyBoundException, NotBoundException,
+    public iReduceTask[] getReducers(String[] keys) throws RemoteException, AlreadyBoundException, NotBoundException,
             InterruptedException {
-        // iMapper object calls this function, sends its list of keys.
+        // iMapTask object calls this function, sends its list of keys.
         // Returns array of corresponding reducers to the mapper
         // If a key is received without a corresponding reducer, then create the reducer using createReduceTask
-        iReducer[] reducers = new iReducer[keys.length];
+        iReduceTask[] reducers = new iReduceTask[keys.length];
         int i = 0;
         for (String k : keys) {
             // if there is no reducer associated with a key, create a new reducer
@@ -46,7 +45,7 @@ public class Master extends UnicastRemoteObject implements iMaster {
                 if (reducerIndex == IPList.size())
                     reducerIndex = 0;
                 Registry reg = LocateRegistry.getRegistry(IPList.get(reducerIndex));
-                iReducer factory = (iReducer) reg.lookup("reduce_manager");
+                iReduceTask factory = (iReduceTask) reg.lookup("reduce_manager");
                 this.reducers.put(k, factory.createReduceTask(k, this));
                 reducerIndex++;
             }
@@ -73,7 +72,7 @@ public class Master extends UnicastRemoteObject implements iMaster {
                     try {
                         for (String ip : IPList) {
                             System.out.println("Terminating reduce tasks for IP: " + ip);
-                            ((iReducer) LocateRegistry.getRegistry(ip).lookup("reduce_manager")).terminateReducingTasks();
+                            ((iReduceTask) LocateRegistry.getRegistry(ip).lookup("reduce_manager")).terminateReducingTasks();
                         }
                         writeWordCountToFile();
                     } catch (IOException | NotBoundException e) {
@@ -104,7 +103,7 @@ public class Master extends UnicastRemoteObject implements iMaster {
     }
 
     public void startWordCount() throws IOException, NotBoundException, AlreadyBoundException, InterruptedException {
-        System.out.println("Starting to read file and create Mapper tasks for each line.");
+        System.out.println("Starting to read file and create MapTask tasks for each line.");
         BufferedReader reader = new BufferedReader(new FileReader(filePath));
         String line;
         int i = 0;
@@ -115,7 +114,7 @@ public class Master extends UnicastRemoteObject implements iMaster {
             if (i == IPList.size())
                 i = 0;
             Registry reg = LocateRegistry.getRegistry(IPList.get(i));
-            iMapper factory = (iMapper) reg.lookup("map_manager");
+            iMapTask factory = (iMapTask) reg.lookup("map_manager");
             mutex.acquire();
             mapTaskIndex++;
             mutex.release();
